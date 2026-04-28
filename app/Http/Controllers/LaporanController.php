@@ -27,11 +27,17 @@ class LaporanController extends Controller
         $totalRevenue = (clone $query)->where('status', StatusPermohonan::Selesai)->sum('bphtb_terutang');
         $totalPending = (clone $query)->whereIn('status', [StatusPermohonan::Diajukan, StatusPermohonan::Diverifikasi])->count();
 
+        $printPermohonans = (clone $query)
+            ->orderBy('tanggal_pengajuan')
+            ->orderBy('nomor_permohonan')
+            ->get();
+
         $permohonans = $query->latest()->paginate(20);
         $districts = District::where('city_code', '1409')->orderBy('name')->get(); // Kuansing
 
         return view('laporan.index', compact(
             'permohonans',
+            'printPermohonans',
             'districts',
             'totalPermohonan',
             'totalRevenue',
